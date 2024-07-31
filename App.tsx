@@ -37,7 +37,7 @@ const MainNavigator = () => {
   return (
     <NavigationContainer theme={theme}>
       <Stack.Navigator>
-        {/* <Stack.Screen name="LoginScreen" component={LoginScreen} /> */}
+        <Stack.Screen name="LoginScreen" component={LoginScreen} />
         <Stack.Screen name="Profile" component={UserProfileScreen} />
         <Stack.Screen name="Products" component={ProductList} />
         <Stack.Screen name="OrderForm" component={OrderForm} />

@@ -17,6 +17,7 @@ import {useDispatch} from 'react-redux';
 import {dismissKeyboard} from '../../common/Constants';
 import * as ImagePicker from 'react-native-image-picker';
 import DocumentPicker from 'react-native-document-picker';
+import RNFS from 'react-native-fs';
 
 function OrderForm(props: any) {
   const {navigation} = props;
@@ -72,8 +73,19 @@ function OrderForm(props: any) {
     });
 
     if (result.assets) {
-      setMedia({...media, image: result.assets[0].uri});
+      // setMedia({...media, image: result.assets[0].uri});
+      const uri = result.assets[0].uri;
+      setMedia({...media, image: uri});
+
+      // Convert the image URI to a Blob
+      const blob = await convertUriToBlob(uri);
+      console.log('Image Blob:', blob);
     }
+  };
+  const convertUriToBlob = async uri => {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    return blob;
   };
 
   const pickVideo = async () => {
