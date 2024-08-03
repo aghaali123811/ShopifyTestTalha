@@ -23,7 +23,14 @@ export default function Input(props) {
   } = props;
   return (
     <View style={{...styles.container, ...containerStyle}}>
-      {icon && <SvgUri width={18} height={18} style={{...styles.icon, ...iconStyle}} source={icon} />}
+      {icon && (
+        <SvgUri
+          width={18}
+          height={18}
+          style={{...styles.icon, ...iconStyle}}
+          source={icon}
+        />
+      )}
       <View>
         {topText && (
           <Text
@@ -68,7 +75,8 @@ const styles = StyleSheet.create({
   input: {
     width: 285,
     height: 50,
-    color:Colors.neutralGrey
+    color: Colors.neutralGrey,
+    paddingLeft: 12,
   },
   topText: {
     fontSize: 12,

@@ -1,27 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-  Switch
+  Switch,
 } from 'react-native';
 import styles from './styles';
 import ImagePath from '../../common/ImagePath';
-import Header from '../../components/Headers/Header';
-import BackButton from '../../components/Buttons/BackButton';
 import Input from '../../components/TextInput/Input';
 import Button from '../../components/Buttons/Button';
 import APIService from '../../network/APIService';
 import Loader from '../../components/Loader/Loader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import Strings from '../../common/Strings';
-import { dismissKeyboard } from '../../common/Constants';
-import { setTheme, setToken } from '../../toolkit/authSlice';
+import {dismissKeyboard} from '../../common/Constants';
+import {setTheme, setToken} from '../../toolkit/authSlice';
 
 function LoginScreen(props) {
-  const { navigation } = props;
+  const {navigation} = props;
   const dispatch = useDispatch();
   const userData = useSelector(state => state.auth);
   const [email, setEmail] = useState('');
@@ -38,7 +36,9 @@ function LoginScreen(props) {
       const theme = await AsyncStorage.getItem('theme');
 
       if (token && user) {
-        dispatch(loadState({ token, user: JSON.parse(user), theme: theme || 'light' }));
+        dispatch(
+          loadState({token, user: JSON.parse(user), theme: theme || 'light'}),
+        );
         navigation.replace('HomeScreen');
       }
     };
@@ -51,7 +51,7 @@ function LoginScreen(props) {
     try {
       const response = await APIService.login(email, password);
       if (response && response?.user) {
-        dispatch(setToken({ token: response.token, user: response.user }));
+        dispatch(setToken({token: response.token, user: response.user}));
         const jsonValue = JSON.stringify(response?.user);
         await AsyncStorage.setItem('user', jsonValue);
         await AsyncStorage.setItem('token', response?.token);
@@ -121,7 +121,7 @@ function LoginScreen(props) {
           <Button
             btnTitle={Strings.login}
             onPress={() => validationButton()}
-            containerStyle={{ marginTop: 30 }}
+            containerStyle={{marginTop: 30}}
           />
           <Text style={styles.noAccount} allowFontScaling={false}>
             {Strings.doNothaveAccount}

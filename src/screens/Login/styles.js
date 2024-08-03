@@ -7,6 +7,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 16,
   },
+  forgetPassword: {
+    marginTop: 10,
+    color: 'black',
+  },
+  noAccount: {
+    marginTop: 10,
+  },
   padding: {
     padding: 16,
   },

@@ -9,6 +9,13 @@ import {
   Alert,
 } from 'react-native';
 import {RouteProp, useRoute} from '@react-navigation/native';
+import Animated, {
+  Easing,
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
+import AnimatedText from '../../components/AnimatedText/AnimatedText';
 
 interface ProductDetailRouteParams {
   product: {
@@ -29,9 +36,12 @@ const ProductDetailScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
       <Image source={{uri: product.image}} style={styles.image} />
-      <Text style={styles.title}>{product.title}</Text>
       <Text style={styles.price}>${product.price}</Text>
-      <Text style={styles.description}>{product.description}</Text>
+      <AnimatedText style={styles.title} description={product.title} />
+      <AnimatedText
+        style={styles.description}
+        description={product.description}
+      />
       <Button
         title="Place Order"
         onPress={() => navigation.navigate('OrderForm')}
