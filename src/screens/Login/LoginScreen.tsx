@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Text,
   TouchableOpacity,
@@ -13,21 +13,25 @@ import Button from '../../components/Buttons/Button';
 import APIService from '../../network/APIService';
 import Loader from '../../components/Loader/Loader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Strings from '../../common/Strings';
-import {dismissKeyboard} from '../../common/Constants';
-import {setTheme, setToken} from '../../toolkit/authSlice';
+import { dismissKeyboard } from '../../common/Constants';
+import { setTheme, setToken, loadState } from '../../toolkit/authSlice';
+import { RootState } from '../../store';
 
-function LoginScreen(props) {
-  const {navigation} = props;
+interface Props {
+  navigation: any;
+}
+
+const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const dispatch = useDispatch();
-  const userData = useSelector(state => state.auth);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const theme = useSelector(state => state.auth.theme);
-  const [darkMode, setDarkMode] = useState(theme === 'dark');
+  const userData = useSelector((state: RootState) => state.auth);
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const theme = useSelector((state: RootState) => state.auth.theme);
+  const [darkMode, setDarkMode] = useState<boolean>(theme === 'dark');
 
   useEffect(() => {
     const loadAuthState = async () => {
@@ -37,7 +41,7 @@ function LoginScreen(props) {
 
       if (token && user) {
         dispatch(
-          loadState({token, user: JSON.parse(user), theme: theme || 'light'}),
+          loadState({ token, user: JSON.parse(user), theme: theme || 'light' }),
         );
         navigation.replace('HomeScreen');
       }
@@ -48,34 +52,28 @@ function LoginScreen(props) {
 
   const handleLogin = async () => {
     setError('');
+    setLoading(true);
     try {
-      const response = await APIService.login(email, password);
-      if (response && response?.user) {
-        dispatch(setToken({token: response.token, user: response.user}));
-        const jsonValue = JSON.stringify(response?.user);
-        await AsyncStorage.setItem('user', jsonValue);
-        await AsyncStorage.setItem('token', response?.token);
-        navigation.replace('HomeScreen');
-      }
-      setLoading(false);
-      console.log(response);
+        // dispatch(setToken({ token: response.token, user: response.user }));
+        // const jsonValue = JSON.stringify(response.user);
+        // await AsyncStorage.setItem('user', jsonValue);
+        // await AsyncStorage.setItem('token', response.token);
+        navigation.replace('Products');
     } catch (error) {
+      setError(error|| 'Something went wrong');
+    } finally {
       setLoading(false);
-      setError(error?.response?.data?.message || 'Something went wrong');
-      console.error(error.response.data);
     }
   };
 
   const validationButton = () => {
-    navigation.replace('Products');
-    // if (email === '' || email.length < 5) {
-    //   alert(Strings.addCorrectEmail);
-    // } else if (password === '' || password.length < 5) {
-    //   alert(Strings.addCorrectPassword);
-    // } else {
-    //   setLoading(true);
-    //   handleLogin();
-    // }
+    if (email === '' || email.length < 5) {
+      alert(Strings.addCorrectEmail);
+    } else if (password === '' || password.length < 5) {
+      alert(Strings.addCorrectPassword);
+    } else {
+      handleLogin();
+    }
   };
 
   const toggleDarkMode = async () => {
@@ -89,46 +87,42 @@ function LoginScreen(props) {
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <View style={styles.container}>
         <View style={styles.padding}>
-          <Text allowFontScaling={false} style={styles.login}>
+          <Text allowFontScaling={false} style={styles.header}>
             {Strings.login}
           </Text>
           <Text allowFontScaling={false} style={styles.letStarted}>
             {Strings.letsGetStarted}
           </Text>
-          <Text allowFontScaling={false} style={styles.error}>
-            {error}
-          </Text>
+          {error ? (
+            <Text allowFontScaling={false} style={styles.error}>
+              {error}
+            </Text>
+          ) : null}
           <Input
             icon={ImagePath.email}
             value={email}
             placeholder={Strings.email}
-            onChangeText={_ => setEmail(_)}
+            onChangeText={setEmail}
           />
           <Input
             icon={ImagePath.lock}
             value={password}
             placeholder={Strings.password}
-            secureTextEntry={true}
-            onChangeText={_ => setPassword(_)}
+            secureTextEntry
+            onChangeText={setPassword}
           />
-          <TouchableOpacity
-            style={styles.forgetPasswordBtn}
-            onPress={() => navigation.navigate('ForgetPasswordScreen')}>
-            <Text allowFontScaling={false} style={styles.forgetPassword}>
-              {Strings.forgotPassword}
-            </Text>
-          </TouchableOpacity>
           <Button
             btnTitle={Strings.login}
-            onPress={() => validationButton()}
-            containerStyle={{marginTop: 30}}
+            onPress={handleLogin}
+            containerStyle={{ marginTop: 30 }}
           />
           <Text style={styles.noAccount} allowFontScaling={false}>
             {Strings.doNothaveAccount}
             <Text
               allowFontScaling={false}
               style={styles.signUp}
-              onPress={() => navigation.navigate('SignUpScreen')}>
+              onPress={() => navigation.navigate('SignUpScreen')}
+            >
               {Strings.signup}
             </Text>
           </Text>
@@ -142,6 +136,6 @@ function LoginScreen(props) {
       </View>
     </TouchableWithoutFeedback>
   );
-}
+};
 
 export default LoginScreen;

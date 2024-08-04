@@ -5,6 +5,7 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import {useQuery} from '@tanstack/react-query';
 import axios from 'axios';
@@ -33,8 +34,19 @@ const ProductList = () => {
     queryFn: fetchProducts,
   });
 
-  if (isLoading) return <Text>Loading...</Text>;
-  if (error) return <Text>Error fetching products</Text>;
+  if (isLoading)
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <ActivityIndicator size={'large'} />
+        <Text>Loading...</Text>
+      </View>
+    );
+  if (error)
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <Text>Error fetching products</Text>
+      </View>
+    );
 
   return (
     <FlatList
