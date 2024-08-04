@@ -16,6 +16,11 @@ const Colors = {
   red: 'red',
   green: 'green',
   black50: 'rgba(0, 0, 0, 0.5)',
+
+  background: '#F5F5F5',
+  primary: '#FFC43B',
+  secondary: '#9D9D9D',
+  border: '#DDDDDD',
 };
 
 export default Colors;

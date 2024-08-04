@@ -3,13 +3,47 @@ import Colors from '../../common/Colors';
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  header: {
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.primary,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 4,
+  },
+  headerTitle: {
+    fontSize: 20,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  listContent: {
+    paddingHorizontal: '3%',
+  },
+  card: {
     width: '45%',
     minHeight: 200,
-    marginLeft: '3%',
-    marginTop: 10,
+    margin: '3%',
     borderRadius: 10,
     elevation: 2,
     backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   priceContainer: {
     minWidth: 50,
@@ -18,7 +52,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     left: 10,
-    backgroundColor: '#9D9D9D',
+    backgroundColor: Colors.secondary,
     zIndex: 1000,
   },
   price: {
@@ -26,13 +60,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     paddingHorizontal: 10,
-    marginTop: 0,
   },
   image: {
     width: '100%',
     height: 170,
     resizeMode: 'stretch',
-    borderRadius: 10,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
   },
   productName: {
     color: '#000',

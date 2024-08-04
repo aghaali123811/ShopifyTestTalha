@@ -1,21 +1,14 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
   View,
   Text,
   Image,
   StyleSheet,
   Button,
-  TextInput,
-  Alert,
 } from 'react-native';
-import {RouteProp, useRoute} from '@react-navigation/native';
-import Animated, {
-  Easing,
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
+import {RouteProp, useRoute, NavigationProp, useNavigation} from '@react-navigation/native';
 import AnimatedText from '../../components/AnimatedText/AnimatedText';
+import styles from './styles';
 
 interface ProductDetailRouteParams {
   product: {
@@ -28,9 +21,9 @@ interface ProductDetailRouteParams {
   };
 }
 
-const ProductDetailScreen = ({navigation}) => {
-  const route =
-    useRoute<RouteProp<{params: ProductDetailRouteParams}, 'params'>>();
+const ProductDetailScreen: React.FC = () => {
+  const navigation = useNavigation<NavigationProp<any>>();
+  const route = useRoute<RouteProp<{params: ProductDetailRouteParams}, 'params'>>();
   const {product} = route.params;
 
   return (
@@ -38,10 +31,7 @@ const ProductDetailScreen = ({navigation}) => {
       <Image source={{uri: product.image}} style={styles.image} />
       <Text style={styles.price}>${product.price}</Text>
       <AnimatedText style={styles.title} description={product.title} />
-      <AnimatedText
-        style={styles.description}
-        description={product.description}
-      />
+      <AnimatedText style={styles.description} description={product.description} />
       <Button
         title="Place Order"
         onPress={() => navigation.navigate('OrderForm')}
@@ -49,39 +39,5 @@ const ProductDetailScreen = ({navigation}) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  image: {
-    width: '100%',
-    height: 300,
-    resizeMode: 'contain',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginVertical: 10,
-  },
-  price: {
-    fontSize: 20,
-    color: 'green',
-  },
-  description: {
-    fontSize: 16,
-    color: 'gray',
-    marginBottom: 20,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    padding: 10,
-    marginVertical: 10,
-    borderRadius: 4,
-  },
-});
 
 export default ProductDetailScreen;
