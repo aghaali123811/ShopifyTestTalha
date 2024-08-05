@@ -1,16 +1,10 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  Image,
-  TouchableOpacity,
-  ActivityIndicator,
-} from 'react-native';
+import React, {useContext} from 'react';
+import {View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator} from 'react-native';
 import {useQuery} from '@tanstack/react-query';
 import axios from 'axios';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-import styles from './styles';
+import {t} from 'react-native-tailwindcss';
+import {UserContext} from '../../ContextAPI/UserContext'; // Import context
 
 interface Product {
   id: number;
@@ -32,46 +26,72 @@ const ProductScreen: React.FC = () => {
     queryKey: ['products'],
     queryFn: fetchProducts,
   });
+  
+  const context = useContext(UserContext);
+  const isDarkMode = context?.profile.themePreference === 'dark';
 
   if (isLoading)
     return (
-      <View style={styles.centered}>
+      <View style={[t.flex1, t.itemsCenter, t.justifyCenter]}>
         <ActivityIndicator size={'large'} />
-        <Text>Loading...</Text>
+        <Text style={[t.mt2, t.textLg, isDarkMode ? t.textWhite : t.textBlack]}>Loading...</Text>
       </View>
     );
   if (error)
     return (
-      <View style={styles.centered}>
-        <Text>Error fetching products</Text>
+      <View style={[t.flex1, t.itemsCenter, t.justifyCenter]}>
+        <Text style={[t.textRed500]}>Error fetching products</Text>
       </View>
     );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Products</Text>
+    <View style={[t.flex1, isDarkMode ? t.bgBlack : t.bgWhite]}>
+      <View style={[t.flexRow, t.itemsCenter, t.p6, isDarkMode ? t.bgGray800 : t.bgPrimary, t.shadow]}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Profile')}
+          style={[t.p2, t.absolute, t.top1, t.right1]}>
+                <Text
+              numberOfLines={1}
+              style={[t.textBase, t.fontBold, t.mt2, isDarkMode ? t.textGray400 : t.textGray800]}>
+              {"Profile"}
+            </Text>
+        </TouchableOpacity>
+
       </View>
       <FlatList
         data={data}
         numColumns={2}
         renderItem={({item}) => (
           <TouchableOpacity
-            style={styles.card}
-            onPress={() => navigation.navigate('ProductDetail', {product: item})}>
-            <View style={styles.priceContainer}>
-              <Text style={styles.price}>${item.price}</Text>
+            style={[
+              t.m2,
+              t.p4,
+              isDarkMode ? t.bgGray900 : t.bgWhite,
+              t.shadow,
+              t.roundedLg,
+              t.border,
+              isDarkMode ? t.borderGray700 : t.borderGray300,
+              {width:'46%'}
+            ]}
+            onPress={() =>
+              navigation.navigate('ProductDetail', {product: item})
+            }>
+            <View style={[t.itemsCenter]}>
+              <Text style={[t.text2xl, isDarkMode ? t.textYellow500 : t.textPrimary]}>${item.price}</Text>
             </View>
-            <Image source={{uri: item.image}} style={styles.image} />
+            <Image
+              source={{uri: item.image}}
+              style={[t.wFull, t.h40, t.roundedLg, t.mt2]}
+            />
             <Text
               numberOfLines={1}
-              style={[styles.productName, styles.marginTop]}>
+              style={[t.textBase, t.fontBold, t.mt2, isDarkMode ? t.textGray400 : t.textGray800]}>
               {item.title}
             </Text>
           </TouchableOpacity>
         )}
         keyExtractor={item => item.id.toString()}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[t.p2]}
       />
     </View>
   );

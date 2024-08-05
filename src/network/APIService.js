@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000/api'; // Local API base URL
+const API_BASE_URL = 'https://fakestoreapi.com'; // Local API base URL
 
 class APIService {
   constructor() {
@@ -10,26 +10,12 @@ class APIService {
     });
   }
 
-  async signup(email, password, name) {
+  async submitOrder(order) {
     try {
-      const response = await this.api.post('/v1/signup', {
-        email,
-        password,
-        name,
-      });
+      const response = await this.api.post('/orders', order);
       return response.data;
     } catch (error) {
       throw error.response.data;
-    }
-  }
-
-  async login(email, password) {
-    try {
-      const response = await this.api.post('/v1/signin', {email, password});
-      return response.data;
-    } catch (error) {
-      console.log('error ', error);
-      throw error;
     }
   }
 }

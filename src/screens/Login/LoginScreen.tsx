@@ -1,29 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-  Switch,
-} from 'react-native';
-import styles from './styles';
+import React, {useState, useEffect} from 'react';
+import {Text, TouchableWithoutFeedback, View, Switch} from 'react-native';
 import ImagePath from '../../common/ImagePath';
 import Input from '../../components/TextInput/Input';
-import Button from '../../components/Buttons/Button';
-import APIService from '../../network/APIService';
+import Button from '../../components/Button/Button';
 import Loader from '../../components/Loader/Loader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import Strings from '../../common/Strings';
-import { dismissKeyboard } from '../../common/Constants';
-import { setTheme, setToken, loadState } from '../../toolkit/authSlice';
-import { RootState } from '../../store';
+import {dismissKeyboard} from '../../common/Constants';
+import {setTheme, setToken, loadState} from '../../toolkit/authSlice';
+import {RootState} from '../../store';
+import APIService from '../../network/APIService';
+import {t} from 'react-native-tailwindcss';
 
 interface Props {
   navigation: any;
 }
 
-const LoginScreen: React.FC<Props> = ({ navigation }) => {
+const LoginScreen: React.FC<Props> = ({navigation}) => {
   const dispatch = useDispatch();
   const userData = useSelector((state: RootState) => state.auth);
   const [email, setEmail] = useState<string>('');
@@ -39,11 +33,14 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       const user = await AsyncStorage.getItem('user');
       const theme = await AsyncStorage.getItem('theme');
 
-      if (token && user) {
+      if (user) {
         dispatch(
-          loadState({ token, user: JSON.parse(user), theme: theme || 'light' }),
+          loadState({
+            token: token,
+            user: JSON.parse(user),
+            theme: theme || 'light',
+          }),
         );
-        navigation.replace('HomeScreen');
       }
     };
 
@@ -54,13 +51,16 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
     setError('');
     setLoading(true);
     try {
-        // dispatch(setToken({ token: response.token, user: response.user }));
-        // const jsonValue = JSON.stringify(response.user);
-        // await AsyncStorage.setItem('user', jsonValue);
-        // await AsyncStorage.setItem('token', response.token);
-        navigation.replace('Products');
+      const user = {
+        email: email,
+        password: password,
+      };
+      dispatch(setToken({token: user, user: user}));
+      const jsonValue = JSON.stringify(user);
+      await AsyncStorage.setItem('user', jsonValue);
+      navigation.replace('Products');
     } catch (error) {
-      setError(error|| 'Something went wrong');
+      setError(error.message || 'Something went wrong');
     } finally {
       setLoading(false);
     }
@@ -68,9 +68,9 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 
   const validationButton = () => {
     if (email === '' || email.length < 5) {
-      alert(Strings.addCorrectEmail);
+      alert('Please enter a valid email');
     } else if (password === '' || password.length < 5) {
-      alert(Strings.addCorrectPassword);
+      alert('Please enter a valid password');
     } else {
       handleLogin();
     }
@@ -85,16 +85,31 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
-      <View style={styles.container}>
-        <View style={styles.padding}>
-          <Text allowFontScaling={false} style={styles.header}>
+      <View
+        style={[
+          t.flex1,
+          t.justifyCenter,
+          t.p4,
+          darkMode ? t.bgGray900 : t.bgWhite,
+        ]}>
+        <View style={[t.p4]}>
+          <Text
+            allowFontScaling={false}
+            style={[
+              t.text3xl,
+              t.fontBold,
+              t.mb5,
+              darkMode ? t.textWhite : t.textBlack,
+            ]}>
             {Strings.login}
           </Text>
-          <Text allowFontScaling={false} style={styles.letStarted}>
+          <Text
+            allowFontScaling={false}
+            style={[t.mb4, darkMode ? t.textGray400 : t.textGray700]}>
             {Strings.letsGetStarted}
           </Text>
           {error ? (
-            <Text allowFontScaling={false} style={styles.error}>
+            <Text allowFontScaling={false} style={[t.textRed500, t.mb2]}>
               {error}
             </Text>
           ) : null}
@@ -103,6 +118,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             value={email}
             placeholder={Strings.email}
             onChangeText={setEmail}
+            inputStyle={darkMode ? t.textWhite : t.textBlack}
+            isDarkMode={darkMode}
           />
           <Input
             icon={ImagePath.lock}
@@ -110,28 +127,35 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             placeholder={Strings.password}
             secureTextEntry
             onChangeText={setPassword}
+            inputStyle={darkMode ? t.textWhite : t.textBlack}
+            isDarkMode={darkMode}
           />
           <Button
             btnTitle={Strings.login}
-            onPress={handleLogin}
-            containerStyle={{ marginTop: 30 }}
+            onPress={validationButton}
+            containerStyle={[t.mt8]}
           />
-          <Text style={styles.noAccount} allowFontScaling={false}>
+          <Text
+            style={[t.mt4, darkMode ? t.textGray400 : t.textGray700]}
+            allowFontScaling={false}>
             {Strings.doNothaveAccount}
             <Text
               allowFontScaling={false}
-              style={styles.signUp}
-              onPress={() => navigation.navigate('SignUpScreen')}
-            >
+              style={[t.textBlue500]}
+              onPress={() => navigation.navigate('SignUpScreen')}>
               {Strings.signup}
             </Text>
           </Text>
         </View>
-        <View style={styles.themeContainer}>
-          <Text>Dark Mode</Text>
+        <View style={[t.flexRow, t.itemsCenter, t.justifyCenter, t.mt5]}>
+          <Text style={darkMode ? t.textWhite : t.textBlack}>Dark Mode</Text>
           <Switch value={darkMode} onValueChange={toggleDarkMode} />
         </View>
-        <Text style={styles.terms}>{Strings.privacyPolicyText}</Text>
+        <Text
+          style={[t.mt5, darkMode ? t.textGray400 : t.textGray700]}
+          allowFontScaling={false}>
+          {Strings.privacyPolicyText}
+        </Text>
         {loading && <Loader />}
       </View>
     </TouchableWithoutFeedback>

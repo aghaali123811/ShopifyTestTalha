@@ -1,13 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  Button,
-  TextInput,
-  Alert,
-} from 'react-native';
+import React, {useEffect} from 'react';
+import {StyleSheet} from 'react-native';
 import Animated, {
   Easing,
   useSharedValue,

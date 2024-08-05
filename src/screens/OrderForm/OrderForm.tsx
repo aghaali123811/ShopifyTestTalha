@@ -1,54 +1,64 @@
-import React, { useState } from 'react';
-import {
-  Text,
-  TouchableWithoutFeedback,
-  View,
-  Image,
-  Alert,
-  StyleSheet,
-} from 'react-native';
+import React, {useContext, useState} from 'react';
+import {Text, TouchableWithoutFeedback, View, Image, Alert} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useDispatch } from 'react-redux';
 import * as ImagePicker from 'react-native-image-picker';
 import DocumentPicker from 'react-native-document-picker';
+import {t} from 'react-native-tailwindcss';
 import Input from '../../components/TextInput/Input';
-import Button from '../../components/Buttons/Button';
+import Button from '../../components/Button/Button';
 import Loader from '../../components/Loader/Loader';
-import { dismissKeyboard } from '../../common/Constants';
-import axios from 'axios';
+import {dismissKeyboard} from '../../common/Constants';
+import {UserContext} from '../../ContextAPI/UserContext';
+import {RouteProp, useRoute} from '@react-navigation/native';
+import APIService from '../../network/APIService';
 
-const OrderForm = (props: any) => {
-  const { navigation } = props;
-  const dispatch = useDispatch();
-  const [productName, setProductName] = useState('');
+interface ProductDetailRouteParams {
+  product: {
+    id: number;
+    title: string;
+    price: number;
+    description: string;
+    category: string;
+    image: string;
+  };
+}
+
+const OrderForm = () => {
+  const route =
+    useRoute<RouteProp<{params: ProductDetailRouteParams}, 'params'>>();
+  const {product} = route.params;
+  const context = useContext(UserContext);
+  const [productName, setProductName] = useState(product?.title || '');
   const [description, setDescription] = useState('');
   const [quantity, setQuantity] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [media, setMedia] = useState<{ image: string | null, video: string | null, audio: string | null }>({ image: null, video: null, audio: null });
+  const [media, setMedia] = useState<{
+    image: string | null;
+    video: string | null;
+    audio: string | null;
+  }>({image: null, video: null, audio: null});
+
+  const isDarkMode = context?.profile.themePreference === 'dark';
 
   const handleOrderSubmit = async () => {
     setError('');
     setLoading(true);
     try {
       const order = {
+        product_id: product?.id,
         productName,
         description,
         quantity,
-        media,
+        // media,
       };
-        // const response = await axios.post('https://fakestoreapi.com/orders', {
-        //   product_id: product.id,
-        //   productName,
-        //   description,
-        // });
-      // const response = await APIService.submitOrder(order);
-      // if (response) {
-      Alert.alert('Order submitted successfully');
-      // Store order in AsyncStorage if needed
-      const jsonValue = JSON.stringify(order);
-      await AsyncStorage.setItem('order', jsonValue);
-      // }
+      const response = await APIService.submitOrder(order);
+      if (response) {
+        Alert.alert('Order submitted successfully');
+        // Store order in AsyncStorage if needed
+        const jsonValue = JSON.stringify(order);
+        await AsyncStorage.setItem('order', jsonValue);
+      }
     } catch (error) {
       setError('Something went wrong. Please try again.');
       console.error(error);
@@ -70,10 +80,10 @@ const OrderForm = (props: any) => {
   };
 
   const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibrary({ mediaType: 'photo' });
+    const result = await ImagePicker.launchImageLibrary({mediaType: 'photo'});
     if (result.assets) {
       const uri = result.assets[0].uri;
-      setMedia((prev) => ({ ...prev, image: uri }));
+      setMedia(prev => ({...prev, image: uri}));
       // Convert the image URI to a Blob
       const blob = await convertUriToBlob(uri);
       console.log('Image Blob:', blob);
@@ -87,17 +97,19 @@ const OrderForm = (props: any) => {
   };
 
   const pickVideo = async () => {
-    const result = await ImagePicker.launchImageLibrary({ mediaType: 'video' });
+    const result = await ImagePicker.launchImageLibrary({mediaType: 'video'});
     if (result.assets) {
-      setMedia((prev) => ({ ...prev, video: result.assets[0].uri }));
+      setMedia(prev => ({...prev, video: result.assets[0].uri}));
     }
   };
 
   const pickAudio = async () => {
     try {
-      const result = await DocumentPicker.pick({ type: [DocumentPicker.types.audio] });
+      const result = await DocumentPicker.pick({
+        type: [DocumentPicker.types.audio],
+      });
       if (result) {
-        setMedia((prev) => ({ ...prev, audio: result[0].uri }));
+        setMedia(prev => ({...prev, audio: result[0].uri}));
       }
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
@@ -110,86 +122,83 @@ const OrderForm = (props: any) => {
 
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
-      <View style={styles.container}>
-        <View style={styles.padding}>
-          <Text allowFontScaling={false} style={styles.header}>
+      <View style={[t.flex1, isDarkMode ? t.bgGray900 : t.bgWhite, t.p5]}>
+        <View style={t.p5}>
+          <Text
+            allowFontScaling={false}
+            style={[
+              t.text3xl,
+              t.fontBold,
+              t.mb5,
+              isDarkMode ? t.textWhite : t.textBlack,
+            ]}>
             Order Form
           </Text>
-          {error ? <Text allowFontScaling={false} style={styles.error}>{error}</Text> : null}
+          {error ? (
+            <Text allowFontScaling={false} style={[t.textRed500, t.mb2]}>
+              {error}
+            </Text>
+          ) : null}
           <Input
             value={productName}
             placeholder="Product Name"
             onChangeText={setProductName}
+            isDarkMode={isDarkMode}
+            editable={false}
           />
           <Input
             value={description}
             placeholder="Description"
             onChangeText={setDescription}
+            isDarkMode={isDarkMode}
           />
           <Input
             value={quantity}
             placeholder="Quantity"
             keyboardType="numeric"
             onChangeText={setQuantity}
+            isDarkMode={isDarkMode}
           />
-          <View style={styles.mediaButtons}>
+          <View style={t.mt5}>
             <Button btnTitle="Upload Image" onPress={pickImage} />
             {media.image && (
-              <Image source={{ uri: media.image }} style={styles.mediaPreview} />
+              <Image
+                source={{uri: media.image}}
+                style={[t.w24, t.h24, t.my3]}
+              />
             )}
             <Button btnTitle="Upload Video" onPress={pickVideo} />
-            {media.video && <Text style={styles.mediaFile}>{media.video}</Text>}
+            {media.video && (
+              <Text style={[t.mt3, isDarkMode ? t.textWhite : t.textBlack]}>
+                {media.video}
+              </Text>
+            )}
             <Button btnTitle="Upload Audio" onPress={pickAudio} />
-            {media.audio && <Text style={styles.mediaFile}>{media.audio}</Text>}
+            {media.audio && (
+              <Text style={[t.mt3, isDarkMode ? t.textWhite : t.textBlack]}>
+                {media.audio}
+              </Text>
+            )}
           </View>
           <Button
             btnTitle="Submit Order"
             onPress={validationButton}
-            containerStyle={{ marginTop: 30 }}
+            containerStyle={[t.mt8]}
           />
         </View>
-        <Text style={styles.terms}>
+        <Text
+          style={[
+            t.textCenter,
+            t.textGray600,
+            t.mt8,
+            isDarkMode ? t.textGray400 : t.textGray600,
+          ]}>
           By placing an order, you agree to our terms and conditions.
         </Text>
         {loading && <Loader />}
       </View>
     </TouchableWithoutFeedback>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  padding: {
-    padding: 20,
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  error: {
-    color: 'red',
-    marginBottom: 10,
-  },
-  mediaButtons: {
-    marginTop: 20,
-  },
-  mediaPreview: {
-    width: 100,
-    height: 100,
-    marginVertical: 10,
-  },
-  mediaFile: {
-    marginTop: 10,
-  },
-  terms: {
-    textAlign: 'center',
-    color: '#888',
-    marginTop: 20,
-  },
-});
+};
 
 export default OrderForm;

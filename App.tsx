@@ -37,7 +37,14 @@ const MainNavigator = () => {
 
   return (
     <NavigationContainer theme={theme}>
-      <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+          headerStyle: {
+            backgroundColor: theme.colors.card, // Apply theme colors
+          },
+          headerTintColor: theme.colors.text,
+        }}>
         <Stack.Screen name="LoginScreen" component={LoginScreen} />
         <Stack.Screen name="Profile" component={UserProfileScreen} />
         <Stack.Screen name="Products" component={ProductScreen} />
